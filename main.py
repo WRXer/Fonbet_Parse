@@ -4,7 +4,7 @@ import logging
 
 from telebot.async_telebot import AsyncTeleBot
 from dotenv import load_dotenv
-from logging import setup_logging
+from project_logging import setup_logging
 from fonbet_parsing import fetch_and_display_events
 
 
