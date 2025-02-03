@@ -2,13 +2,14 @@ import requests
 import pandas as pd
 import os, json
 import logging
-from logging import flashscore_logging
+from project_logging import flashscore_logging
+from concurrent.futures import ThreadPoolExecutor
 
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))  #Папка scripts
-PROJECT_ROOT = os.path.dirname(BASE_DIR)              #Папка flashscore
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))    #Папка scripts
+PROJECT_ROOT = os.path.dirname(BASE_DIR)    #Папка flashscore
 FONBET_PARSE_DIR = os.path.join(PROJECT_ROOT, 'Fonbet_Parse')
-DATA_DIR = os.path.join(FONBET_PARSE_DIR, 'data')         #Папка data
+DATA_DIR = os.path.join(FONBET_PARSE_DIR, 'data')    #Папка data
 os.makedirs(DATA_DIR, exist_ok=True)    #Создаем папку data, если ее нет
 flashscore_logging()    #Вызываем функцию для настройки логирования
 
@@ -155,8 +156,19 @@ def fetch_and_process_data(league, base_url):
         logging.error(f"Произошла ошибка: {e}")
         print(f"Произошла ошибка: {e}")
 
+class ParseUpdater:
+    """
+    Параллельный парсинг
+    """
+    def __init__(self, max_threads):
+        self.max_threads = max_threads
 
-def run():
+    def fetch_data_for_leagues(self, json_data):
+        with ThreadPoolExecutor(max_workers=self.max_threads) as executor:
+            executor.map(lambda league_base_url: fetch_and_process_data(league_base_url[0], league_base_url[1]),
+                         json_data.items())     #Параллельная обработка каждой лиги
+
+def flashscore_parse():
     """
     Основная функция для запуска парсера
     """
@@ -164,11 +176,11 @@ def run():
         logging.info("Начинаю обработку лиг.")
         with open('flashscore_list.json', 'r') as f:    #Загружаем JSON файл
             json_data = json.load(f)
-        for league, base_url in json_data.items():    #Перебираем все лиги по очереди
-            fetch_and_process_data(league, base_url)
+        updater = ParseUpdater(max_threads=5)    #Создаем экземпляр ParseUpdater и запускаем обработку
+        updater.fetch_data_for_leagues(json_data)
     except Exception as e:
         logging.error(f"Произошла ошибка в основной функции: {e}")
 
 
 if __name__ == "__main__":    #Заглушка, удалить при соединении с мейн
-    run()
+    flashscore_parse()
