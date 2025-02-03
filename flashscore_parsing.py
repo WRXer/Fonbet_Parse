@@ -1,6 +1,8 @@
 import requests
 import pandas as pd
 import os, json
+import logging
+from logging import flashscore_logging
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))  #Папка scripts
@@ -8,7 +10,7 @@ PROJECT_ROOT = os.path.dirname(BASE_DIR)              #Папка flashscore
 FONBET_PARSE_DIR = os.path.join(PROJECT_ROOT, 'Fonbet_Parse')
 DATA_DIR = os.path.join(FONBET_PARSE_DIR, 'data')         #Папка data
 os.makedirs(DATA_DIR, exist_ok=True)    #Создаем папку data, если ее нет
-
+flashscore_logging()    #Вызываем функцию для настройки логирования
 
 headers = {
     "x-fsign": "SW9D1eZo",
@@ -91,6 +93,7 @@ def calculate_aggregates(matches, last_n=None):
 
 def fetch_and_process_data(league, base_url):
     try:
+        logging.info(f"Начинаю обработку данных для лиги: {league}")
         all_data = {}
         urls = {
             "Общие матчи": f"{base_url}_1",
@@ -146,9 +149,10 @@ def fetch_and_process_data(league, base_url):
             for sheet_name, df in all_data.items():
                 sheet_name = sheet_name[:31]
                 df.to_excel(writer, sheet_name=sheet_name, index=False)
+        logging.info(f"Данные успешно записаны в {output_path}")
         print(f"Данные успешно записаны в {output_path}")
-
     except Exception as e:
+        logging.error(f"Произошла ошибка: {e}")
         print(f"Произошла ошибка: {e}")
 
 
@@ -156,10 +160,15 @@ def run():
     """
     Основная функция для запуска парсера
     """
-    with open('flashscore_list.json', 'r') as f:  #Загружаем JSON файл
-        json_data = json.load(f)
-    for league, base_url in json_data.items():    #Перебираем все лиги по очереди
-        fetch_and_process_data(league, base_url)
+    try:
+        logging.info("Начинаю обработку лиг.")
+        with open('flashscore_list.json', 'r') as f:    #Загружаем JSON файл
+            json_data = json.load(f)
+        for league, base_url in json_data.items():    #Перебираем все лиги по очереди
+            fetch_and_process_data(league, base_url)
+    except Exception as e:
+        logging.error(f"Произошла ошибка в основной функции: {e}")
+
 
 if __name__ == "__main__":    #Заглушка, удалить при соединении с мейн
     run()
