@@ -96,6 +96,12 @@ def fetch_and_process_data(league, base_url):
     try:
         logging.info(f"Начинаю обработку данных для лиги: {league}")
         all_data = {}
+        if league == 'KHL':
+            MAX_TEAMS = 23  # Максимальное количество команд
+        elif league == 'COHL':
+            MAX_TEAMS = 20  # Максимальное количество команд
+        else:
+            MAX_TEAMS = 50  # Максимальное количество команд
         urls = {
             "Общие матчи": f"{base_url}_1",
             "Домашние матчи": f"{base_url}_2",
@@ -110,7 +116,11 @@ def fetch_and_process_data(league, base_url):
                 data = response.text
                 blocks = data.split('~TR÷')[1:]
                 all_teams = []
+                team_count = 0    #Инициализация счетчика
+
                 for block in blocks:
+                    if team_count >= MAX_TEAMS:    #Проверка лимита
+                        break
                     team_data = parse_team_data_with_matches(block)
                     if category in ["Последние 5 матчей", "Последние 5 матчей дома", "Последние 5 матчей на выезде"]:
                         if team_data.get("TM") == "5":
@@ -127,6 +137,7 @@ def fetch_and_process_data(league, base_url):
                                 "Забитые голы": team_data.get("TG", "").split(":")[0],
                                 "Пропущенные голы": team_data.get("TG", "").split(":")[1] if ":" in team_data.get("TG", "") else ""
                             })
+                            team_count += 1
                     else:
                         all_teams.append({
                             "Команда": team_data.get("TN"),
@@ -141,7 +152,8 @@ def fetch_and_process_data(league, base_url):
                             "Забитые голы": team_data.get("TG", "").split(":")[0],
                             "Пропущенные голы": team_data.get("TG", "").split(":")[1] if ":" in team_data.get("TG", "") else ""
                         })
-                all_data[f"{category} (Все матчи)"] = pd.DataFrame(all_teams)
+                        team_count += 1
+                all_data[f"{category} (Все матчи)"] = pd.DataFrame(all_teams[:MAX_TEAMS])
             else:
                 print(f"Ошибка для {category}: {response.status_code}")
 
