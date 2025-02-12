@@ -25,12 +25,14 @@ def fetch_and_display_line_events(file_name):
         f'https://line52w.bk6bba-resources.com/events/list?lang={language}&version=36403772709&scopeMarket=1600'
     )
     data = response.json()
+    #with open("dump.json", "w", encoding="utf-8") as f:
+    #    json.dump(data, f, ensure_ascii=False, indent=4)    #Сохраняем всю инфо с фонбет
     events = data.get('events', [])    #Список событий
     custom_factors = data.get('customFactors', [])    #Список коэффициентов
     filtered_events = [
         event for event in events
-        if event.get('place') == 'line' and
-           event.get('sportId') == sport_id and
+        #if event.get('place') == 'line' and
+        if event.get('sportId') == sport_id and
            event.get('level') == 1
     ]   #Фильтруем нужные нам события
     new_events = [
