@@ -100,6 +100,10 @@ def fetch_and_process_data(league, base_url):
             MAX_TEAMS = 23  # Максимальное количество команд
         elif league == 'COHL':
             MAX_TEAMS = 20  # Максимальное количество команд
+        elif league == 'NHL':
+            MAX_TEAMS = 32
+        elif league == 'WHL':
+            MAX_TEAMS = 22
         else:
             MAX_TEAMS = 50  # Максимальное количество команд
         urls = {
@@ -194,5 +198,5 @@ def flashscore_parse():
         logging.error(f"Произошла ошибка в основной функции: {e}")
 
 
-if __name__ == "__main__":    #Заглушка, удалить при соединении с мейн
-    flashscore_parse()
+#if __name__ == "__main__":    #Заглушка, удалить при соединении с мейн
+#    flashscore_parse()
