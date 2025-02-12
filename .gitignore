@@ -170,5 +170,5 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-
-sport_ids.txt
+flashscore_list.json
+sport_ids.json
