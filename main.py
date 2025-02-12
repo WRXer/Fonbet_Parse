@@ -5,7 +5,7 @@ import logging
 from telebot.async_telebot import AsyncTeleBot
 from dotenv import load_dotenv
 from project_logging import setup_logging
-from fonbet_parsing import fetch_and_display_events
+from fonbet_parsing import fetch_and_display_line_events
 
 
 load_dotenv()
@@ -24,7 +24,7 @@ chat_ids = set()    # Глобальный список для хранения 
 async def send_message():
     try:
         loop = asyncio.get_running_loop()
-        message_matches = await loop.run_in_executor(None, fetch_and_display_events)     # Выполняем синхронную функцию в асинхронном контексте
+        message_matches = await loop.run_in_executor(None, fetch_and_display_line_events)     # Выполняем синхронную функцию в асинхронном контексте
         if message_matches:    # Проверяем, есть ли что отправить
             for chat_id in chat_ids:
                 await bot.send_message(chat_id, text=message_matches)
@@ -56,13 +56,13 @@ async def id_handler(message):
     chat_id = message.chat.id
     try:
         sport_id = int(message.text.split()[1])
-        with open('sport_ids.txt', 'r') as f:    #Чтение существующих ID из файла
+        with open('sport_ids.json', 'r') as f:    #Чтение существующих ID из файла
             existing_ids = {int(line.strip()) for line in f if line.strip().isdigit()}
 
         if sport_id in existing_ids:
             await bot.send_message(chat_id, f"ID {sport_id} уже существует в списке.")
         else:
-            with open('sport_ids.txt', 'a') as f:
+            with open('sport_ids.json', 'a') as f:
                 f.write(f"{sport_id}\n")
             await bot.send_message(chat_id, f"ID {sport_id} добавлен в список.")
     except (IndexError, ValueError):
@@ -79,11 +79,11 @@ async def id_handler(message):
     chat_id = message.chat.id
     try:
         sport_id = int(message.text.split()[1])
-        with open('sport_ids.txt', 'r') as f:    # Чтение существующих ID из файла
+        with open('sport_ids.json', 'r') as f:    # Чтение существующих ID из файла
             existing_ids = {int(line.strip()) for line in f if line.strip().isdigit()}
 
         if sport_id in existing_ids:
-            with open('sport_ids.txt', 'w') as f:
+            with open('sport_ids.json', 'w') as f:
                 for id in existing_ids:
                     if id != sport_id:
                         f.write(f"{id}\n")
