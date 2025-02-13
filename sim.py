@@ -1,11 +1,9 @@
-import pandas as pd
-import numpy as np
 import tkinter as tk
 from tkinter import ttk, messagebox
 import difflib
 import os
-from scipy.stats import nbinom
 
+from tkinter.messagebox import showinfo
 from computation import load_excel_file, calculate_averages, simulate_matches
 from flashscore_parsing import flashscore_parse
 from fonbet_parsing import fetch_and_display_line_events
@@ -278,7 +276,7 @@ class SimulationApp:
             flashscore_parse()
         except Exception as e:
             messagebox.showerror("Ошибка", str(e))
-        print("Обновление выполнено")
+        showinfo(title="Внимание!", message="Обновление таблиц выполнено")
 
 
 
@@ -434,25 +432,25 @@ class SimulationApp:
                     odds = 1 / prob if prob > 0 else 0
                     if handicap == "-1.5" and team == "Хозяева":
                         ttk.Label(frame,
-                                  text=f"{key}: {prob * 100:.2f}% (x{odds:.2f}) fon {a["fminus15k1"]}",
+                                  text=f'{key}: {prob * 100:.2f}% (x{odds:.2f}) fon {a["fminus15k1"]}',
                                   width=35,
                                   style="Data.TLabel"
                                   ).pack(anchor=tk.W, pady=2)
                     elif handicap == "+1.5" and team == "Хозяева":
                         ttk.Label(frame,
-                                  text=f"{key}: {prob * 100:.2f}% (x{odds:.2f}) fon {a["fplus15k1"]}",
+                                  text=f'{key}: {prob * 100:.2f}% (x{odds:.2f}) fon {a["fplus15k1"]}',
                                   width=35,
                                   style="Data.TLabel"
                                   ).pack(anchor=tk.W, pady=2)
                     elif handicap == "-1.5" and team == "Гости":
                         ttk.Label(frame,
-                                  text=f"{key}: {prob * 100:.2f}% (x{odds:.2f}) fon {a["fminus15k2"]}",
+                                  text=f'{key}: {prob * 100:.2f}% (x{odds:.2f}) fon {a["fminus15k2"]}',
                                   width=35,
                                   style="Data.TLabel"
                                   ).pack(anchor=tk.W, pady=2)
                     elif handicap == "+1.5" and team == "Гости":
                         ttk.Label(frame,
-                                  text=f"{key}: {prob * 100:.2f}% (x{odds:.2f}) fon {a["fplus15k2"]}",
+                                  text=f'{key}: {prob * 100:.2f}% (x{odds:.2f}) fon {a["fplus15k2"]}',
                                   width=35,
                                   style="Data.TLabel"
                                   ).pack(anchor=tk.W, pady=2)
