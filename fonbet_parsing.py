@@ -54,10 +54,12 @@ def fetch_and_display_line_events(file_name):
                 p1, pt_p1 = factors.get(921, ("—", ""))    #П1
                 x, pt_x = factors.get(922, ("—", ""))    #Х
                 p2, pt_p2 = factors.get(923, ("—", ""))    #П2
-                """Список нужных значений f"""
+                """Список нужных значений фор и тоталов"""
                 target_fora_team1 = {910, 927, 989, 1569, 1672, 1677, 1680, 1683, 1686}
                 target_fora_team2 = {912, 928, 991, 1572, 1675, 1678, 1681, 1684, 1687}
-                """Ищем Фору среди нужных f, если pt = +1.5 или -1,5"""
+                target_tb = {1733, 1736, 1739, 1793, 1799, 1802, 930, 1696, 1726, 1730, 1796}
+                target_tm = {1734, 1737, 1791, 1794, 1800, 1803, 931, 1697, 1727, 1731, 1797}
+                """Ищем Фору среди нужных, если pt = +1.5 или -1,5"""
                 fplus15k1 = next((factor['v'] for factor in event_factors.get('factors', [])
                            if factor['f'] in target_fora_team1 and factor.get('pt') == "+1.5"), "—")
                 fminus15k1 = next((factor['v'] for factor in event_factors.get('factors', [])
@@ -66,7 +68,19 @@ def fetch_and_display_line_events(file_name):
                                   if factor['f'] in target_fora_team2 and factor.get('pt') == "+1.5"), "—")
                 fminus15k2 = next((factor['v'] for factor in event_factors.get('factors', [])
                                    if factor['f'] in target_fora_team2 and factor.get('pt') == "-1.5"), "—")
-
+                """Ищем тоталы, pt = 4.5, 5.5, 6.5"""
+                tb_45 = next((factor['v'] for factor in event_factors.get('factors', [])
+                           if factor['f'] in target_tb and factor.get('pt') == "4.5"), "—")
+                tm_45 = next((factor['v'] for factor in event_factors.get('factors', [])
+                              if factor['f'] in target_tm and factor.get('pt') == "4.5"), "—")
+                tb_55 = next((factor['v'] for factor in event_factors.get('factors', [])
+                              if factor['f'] in target_tb and factor.get('pt') == "5.5"), "—")
+                tm_55 = next((factor['v'] for factor in event_factors.get('factors', [])
+                              if factor['f'] in target_tm and factor.get('pt') == "5.5"), "—")
+                tb_65 = next((factor['v'] for factor in event_factors.get('factors', [])
+                              if factor['f'] in target_tb and factor.get('pt') == "6.5"), "—")
+                tm_65 = next((factor['v'] for factor in event_factors.get('factors', [])
+                              if factor['f'] in target_tm and factor.get('pt') == "6.5"), "—")
                 #if float(flashscore_info['k1']) + 0.15 < float(p1) or float(flashscore_info['k2']) + 0.15 < float(p2):
                      #team_1, float(flashscore_info['k1']) , p1, team_2, float(flashscore_info['k2']), p2
 
@@ -81,7 +95,14 @@ def fetch_and_display_line_events(file_name):
                     "p2": p2,
                     "fplus15k2": fplus15k2,
                     "fminus15k2": fminus15k2,
-                "x": x}
+                "x": x,
+                "tb_45": tb_45,
+                "tm_45": tm_45,
+                "tb_55": tb_55,
+                "tm_55": tm_55,
+                "tb_65": tb_65,
+                "tm_65": tm_65,
+                }
                 matches_info.append(match)
 
         return matches_info

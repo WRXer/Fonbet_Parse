@@ -14,6 +14,7 @@ FONBET_PARSE_DIR = os.path.join(PROJECT_ROOT, 'Fonbet_Parse')
 DATA_DIR = os.path.join(FONBET_PARSE_DIR, 'data')    #Папка data
 
 
+
 class SimulationApp:
     def __init__(self, root):
         self.root = root
@@ -319,8 +320,8 @@ class SimulationApp:
 
         result_window = tk.Toplevel(self.root)
         result_window.title("Результаты симуляции")
-        result_window.minsize(1700, 1000)
-        result_window.geometry("1700x1000")
+        result_window.minsize(1200, 800)
+        result_window.geometry("1200x800")
 
         """Контейнер с прокруткой"""
         container = ttk.Frame(result_window)
@@ -433,25 +434,25 @@ class SimulationApp:
                     if handicap == "-1.5" and team == "Хозяева":
                         ttk.Label(frame,
                                   text=f'{key}: {prob * 100:.2f}% (x{odds:.2f}) fon {a["fminus15k1"]}',
-                                  width=35,
+                                  width=32,
                                   style="Data.TLabel"
                                   ).pack(anchor=tk.W, pady=2)
                     elif handicap == "+1.5" and team == "Хозяева":
                         ttk.Label(frame,
                                   text=f'{key}: {prob * 100:.2f}% (x{odds:.2f}) fon {a["fplus15k1"]}',
-                                  width=35,
+                                  width=32,
                                   style="Data.TLabel"
                                   ).pack(anchor=tk.W, pady=2)
                     elif handicap == "-1.5" and team == "Гости":
                         ttk.Label(frame,
                                   text=f'{key}: {prob * 100:.2f}% (x{odds:.2f}) fon {a["fminus15k2"]}',
-                                  width=35,
+                                  width=32,
                                   style="Data.TLabel"
                                   ).pack(anchor=tk.W, pady=2)
                     elif handicap == "+1.5" and team == "Гости":
                         ttk.Label(frame,
                                   text=f'{key}: {prob * 100:.2f}% (x{odds:.2f}) fon {a["fplus15k2"]}',
-                                  width=35,
+                                  width=32,
                                   style="Data.TLabel"
                                   ).pack(anchor=tk.W, pady=2)
 
@@ -469,12 +470,48 @@ class SimulationApp:
                     key = f"Тотал {tol} {suffix}"
                     prob = results.get(key, 0)
                     odds = 1 / prob if prob > 0 else 0
-                    ttk.Label(frame,
-                              text=f"{prob * 100:.2f}% (x{odds:.2f})",
-                              width=18,
-                              style="Data.TLabel"
-                              ).pack(side=tk.LEFT)
-
+                    if tol == 4.5 and suffix == "больше":
+                        ttk.Label(frame,
+                                  text=f'{prob * 100:.2f}% (x{odds:.2f}) fon {a["tb_45"]} |',
+                                  width=20,
+                                  style="Data.TLabel"
+                                  ).pack(side=tk.LEFT)
+                    elif tol == 4.5 and suffix == "меньше":
+                        ttk.Label(frame,
+                                  text=f'{prob * 100:.2f}% (x{odds:.2f}) fon {a["tm_45"]} |',
+                                  width=20,
+                                  style="Data.TLabel"
+                                  ).pack(side=tk.LEFT)
+                    elif tol == 5.5 and suffix == "больше":
+                        ttk.Label(frame,
+                                  text=f'{prob * 100:.2f}% (x{odds:.2f}) fon {a["tb_55"]} |',
+                                  width=20,
+                                  style="Data.TLabel"
+                                  ).pack(side=tk.LEFT)
+                    elif tol == 5.5 and suffix == "меньше":
+                        ttk.Label(frame,
+                                  text=f'{prob * 100:.2f}% (x{odds:.2f}) fon {a["tm_55"]} |',
+                                  width=20,
+                                  style="Data.TLabel"
+                                  ).pack(side=tk.LEFT)
+                    elif tol == 6.5 and suffix == "больше":
+                        ttk.Label(frame,
+                                  text=f'{prob * 100:.2f}% (x{odds:.2f}) fon {a["tb_65"]} |',
+                                  width=20,
+                                  style="Data.TLabel"
+                                  ).pack(side=tk.LEFT)
+                    elif tol == 6.5 and suffix == "меньше":
+                        ttk.Label(frame,
+                                  text=f'{prob * 100:.2f}% (x{odds:.2f}) fon {a["tm_65"]} |',
+                                  width=20,
+                                  style="Data.TLabel"
+                                  ).pack(side=tk.LEFT)
+                    else:
+                        ttk.Label(frame,
+                                  text=f"{prob * 100:.2f}% (x{odds:.2f})",
+                                  width=18,
+                                  style="Data.TLabel"
+                                  ).pack(side=tk.LEFT)
             """Колонка 5 - Индивидуальные тоталы"""
             col5 = ttk.Frame(columns_frame)
             col5.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10)
