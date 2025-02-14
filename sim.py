@@ -320,239 +320,241 @@ class SimulationApp:
         if data and "Общие матчи (Все матчи)" in data:
             self.league_data = data
 
-        result_window = tk.Toplevel(self.root)
-        result_window.title("Результаты симуляции")
-        result_window.minsize(1200, 800)
-        result_window.geometry("1200x800")
-
-        """Контейнер с прокруткой"""
-        container = ttk.Frame(result_window)
-        container.pack(fill=tk.BOTH, expand=True)
-
-        canvas = tk.Canvas(container)
-        scroll_y = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
-        scroll_x = ttk.Scrollbar(container, orient="horizontal", command=canvas.xview)
-        scrollable_frame = ttk.Frame(canvas)
-
-        canvas.configure(yscrollcommand=scroll_y.set, xscrollcommand=scroll_x.set)
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
-
-        scroll_y.pack(side=tk.RIGHT, fill=tk.Y)
-        scroll_x.pack(side=tk.BOTTOM, fill=tk.X)
-        canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-        """Стилизация"""
-        style = ttk.Style()
-        style.configure("Header.TLabel", font=('Arial', 14, 'bold'), foreground="#2c3e50")
-        style.configure("SubHeader.TLabel", font=('Arial', 12, 'bold'), foreground="#34495e")
-        style.configure("Data.TLabel", font=('Arial', 10))
-
-        """Основной контент"""
-        main_frame = ttk.Frame(scrollable_frame)
-        main_frame.pack(padx=20, pady=20, fill=tk.BOTH, expand=True)
         teams = fetch_and_display_line_events(file_name)
-        print(teams)
-        for a in teams:
-            try:
-                home_team = a["team_1"]
-                away_team = a["team_2"]
-                home_data = self.get_fon_team_data(home_team)
-                away_data = self.get_fon_team_data(away_team)
+        if teams == None:
+            showinfo(title="Внимание!", message="В течение суток нет подходящих событий!")
+        else:
+            result_window = tk.Toplevel(self.root)
+            result_window.title("Результаты симуляции")
+            result_window.minsize(1200, 800)
+            result_window.geometry("1200x800")
 
-                home_avg = calculate_averages(home_data["total"], home_data["home"], home_data["away"])
-                away_avg = calculate_averages(away_data["total"], away_data["away"], away_data["home"])
+            """Контейнер с прокруткой"""
+            container = ttk.Frame(result_window)
+            container.pack(fill=tk.BOTH, expand=True)
 
-                results = simulate_matches(home_avg, away_avg)
-            except Exception as e:
-                messagebox.showerror("Ошибка", str(e))
+            canvas = tk.Canvas(container)
+            scroll_y = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
+            scroll_x = ttk.Scrollbar(container, orient="horizontal", command=canvas.xview)
+            scrollable_frame = ttk.Frame(canvas)
 
-            """Шапка"""
-            header_frame = ttk.Frame(main_frame)
-            header_frame.pack(fill=tk.X, pady=15)
-            ttk.Label(
-                header_frame,
-                style="Header.TLabel"
-            ).pack(side=tk.TOP)
+            canvas.configure(yscrollcommand=scroll_y.set, xscrollcommand=scroll_x.set)
+            canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+
+            scroll_y.pack(side=tk.RIGHT, fill=tk.Y)
+            scroll_x.pack(side=tk.BOTTOM, fill=tk.X)
+            canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+            """Стилизация"""
+            style = ttk.Style()
+            style.configure("Header.TLabel", font=('Arial', 14, 'bold'), foreground="#2c3e50")
+            style.configure("SubHeader.TLabel", font=('Arial', 12, 'bold'), foreground="#34495e")
+            style.configure("Data.TLabel", font=('Arial', 10))
+
+            """Основной контент"""
+            main_frame = ttk.Frame(scrollable_frame)
+            main_frame.pack(padx=20, pady=20, fill=tk.BOTH, expand=True)
+            for a in teams:
+                try:
+                    home_team = a["team_1"]
+                    away_team = a["team_2"]
+                    home_data = self.get_fon_team_data(home_team)
+                    away_data = self.get_fon_team_data(away_team)
+
+                    home_avg = calculate_averages(home_data["total"], home_data["home"], home_data["away"])
+                    away_avg = calculate_averages(away_data["total"], away_data["away"], away_data["home"])
+
+                    results = simulate_matches(home_avg, away_avg)
+                except Exception as e:
+                    messagebox.showerror("Ошибка", str(e))
+
+                """Шапка"""
+                header_frame = ttk.Frame(main_frame)
+                header_frame.pack(fill=tk.X, pady=15)
+                ttk.Label(
+                    header_frame,
+                    style="Header.TLabel"
+                ).pack(side=tk.TOP)
 
 
-            """Колонки"""
-            columns_frame = ttk.Frame(main_frame)
-            columns_frame.pack(fill=tk.BOTH, expand=True)
+                """Колонки"""
+                columns_frame = ttk.Frame(main_frame)
+                columns_frame.pack(fill=tk.BOTH, expand=True)
 
-            """Колонка 1 - Команды"""
-            col1 = ttk.Frame(columns_frame)
-            col1.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10)
-            ttk.Label(col1, text="Команды", style="SubHeader.TLabel").pack(anchor=tk.W)
-            ttk.Label(col1, text=f"{home_team}",
-                    style="Data.TLabel"
-                    ).pack(anchor=tk.W, pady=2)
-            ttk.Label(col1,
-                      text=f"{away_team}",
-                      style="Data.TLabel"
-                      ).pack(anchor=tk.W, pady=2)
-            ttk.Label(col1,
-                      text=f"=====",
-                      style="Data.TLabel"
-                      ).pack(anchor=tk.W, pady=2)
+                """Колонка 1 - Команды"""
+                col1 = ttk.Frame(columns_frame)
+                col1.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10)
+                ttk.Label(col1, text="Команды", style="SubHeader.TLabel").pack(anchor=tk.W)
+                ttk.Label(col1, text=f"{home_team}",
+                        style="Data.TLabel"
+                        ).pack(anchor=tk.W, pady=2)
+                ttk.Label(col1,
+                          text=f"{away_team}",
+                          style="Data.TLabel"
+                          ).pack(anchor=tk.W, pady=2)
+                ttk.Label(col1,
+                          text=f"=====",
+                          style="Data.TLabel"
+                          ).pack(anchor=tk.W, pady=2)
 
-            """Колонка 2 - Основные исходы"""
-            col2 = ttk.Frame(columns_frame)
-            col2.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10)
+                """Колонка 2 - Основные исходы"""
+                col2 = ttk.Frame(columns_frame)
+                col2.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10)
 
-            ttk.Label(col2, text="Основные исходы", style="SubHeader.TLabel").pack(anchor=tk.W)
-            for outcome in ["П1", "П2", "Ничья"]:
-                prob = results.get(outcome, 0)
-                odds = 1 / prob if prob > 0 else 0
-
-                if outcome == "П1":
-                    ttk.Label(col2,
-                              text=f"{outcome}: {prob * 100:.2f}% (x{odds:.2f}) fon {a['p1']}",
-                              style="Data.TLabel"
-                              ).pack(anchor=tk.W, pady=2)
-                elif outcome == "П2":
-                    ttk.Label(col2,
-                              text=f"{outcome}: {prob * 100:.2f}% (x{odds:.2f}) fon {a['p2']}",
-                              style="Data.TLabel"
-                              ).pack(anchor=tk.W, pady=2)
-                else:
-                    ttk.Label(col2,
-                              text=f"{outcome}: {prob * 100:.2f}% (x{odds:.2f}) fon {a['x']}",
-                              style="Data.TLabel"
-                              ).pack(anchor=tk.W, pady=2)
-
-            """Колонка 3 - Форы"""
-            col3 = ttk.Frame(columns_frame)
-            col3.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10)
-
-            ttk.Label(col3, text="Форы", style="SubHeader.TLabel").pack(anchor=tk.W)
-            for team in ["Хозяева", "Гости"]:
-                frame = ttk.Frame(col3)
-                frame.pack(fill=tk.X, pady=3)
-    
-                for handicap in ["-1.5", "+1.5"]:
-                    key = f"{team} {handicap}"
-                    prob = results.get(key, 0)
+                ttk.Label(col2, text="Основные исходы", style="SubHeader.TLabel").pack(anchor=tk.W)
+                for outcome in ["П1", "П2", "Ничья"]:
+                    prob = results.get(outcome, 0)
                     odds = 1 / prob if prob > 0 else 0
-                    if handicap == "-1.5" and team == "Хозяева":
-                        ttk.Label(frame,
-                                  text=f'{key}: {prob * 100:.2f}% (x{odds:.2f}) fon {a["fminus15k1"]}',
-                                  width=32,
-                                  style="Data.TLabel"
-                                  ).pack(anchor=tk.W, pady=2)
-                    elif handicap == "+1.5" and team == "Хозяева":
-                        ttk.Label(frame,
-                                  text=f'{key}: {prob * 100:.2f}% (x{odds:.2f}) fon {a["fplus15k1"]}',
-                                  width=32,
-                                  style="Data.TLabel"
-                                  ).pack(anchor=tk.W, pady=2)
-                    elif handicap == "-1.5" and team == "Гости":
-                        ttk.Label(frame,
-                                  text=f'{key}: {prob * 100:.2f}% (x{odds:.2f}) fon {a["fminus15k2"]}',
-                                  width=32,
-                                  style="Data.TLabel"
-                                  ).pack(anchor=tk.W, pady=2)
-                    elif handicap == "+1.5" and team == "Гости":
-                        ttk.Label(frame,
-                                  text=f'{key}: {prob * 100:.2f}% (x{odds:.2f}) fon {a["fplus15k2"]}',
-                                  width=32,
-                                  style="Data.TLabel"
-                                  ).pack(anchor=tk.W, pady=2)
 
-            """Колонка 4 - Общие тоталы"""
-            col4 = ttk.Frame(columns_frame)
-            col4.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10)
-
-            ttk.Label(col4, text="Общие тоталы", style="SubHeader.TLabel").pack(anchor=tk.W)
-            for tol in [4.5, 5.5, 6.5]:
-                frame = ttk.Frame(col4)
-                frame.pack(fill=tk.X, pady=3)
-    
-                ttk.Label(frame, text=f"Тотал {tol}", width=12, style="Data.TLabel").pack(side=tk.LEFT)
-                for suffix in ["больше", "меньше"]:
-                    key = f"Тотал {tol} {suffix}"
-                    prob = results.get(key, 0)
-                    odds = 1 / prob if prob > 0 else 0
-                    if tol == 4.5 and suffix == "больше":
-                        ttk.Label(frame,
-                                  text=f'{prob * 100:.2f}% (x{odds:.2f}) fon {a["tb_45"]} |',
-                                  width=20,
+                    if outcome == "П1":
+                        ttk.Label(col2,
+                                  text=f"{outcome}: {prob * 100:.2f}% (x{odds:.2f}) fon {a['p1']}",
                                   style="Data.TLabel"
-                                  ).pack(side=tk.LEFT)
-                    elif tol == 4.5 and suffix == "меньше":
-                        ttk.Label(frame,
-                                  text=f'{prob * 100:.2f}% (x{odds:.2f}) fon {a["tm_45"]} |',
-                                  width=20,
+                                  ).pack(anchor=tk.W, pady=2)
+                    elif outcome == "П2":
+                        ttk.Label(col2,
+                                  text=f"{outcome}: {prob * 100:.2f}% (x{odds:.2f}) fon {a['p2']}",
                                   style="Data.TLabel"
-                                  ).pack(side=tk.LEFT)
-                    elif tol == 5.5 and suffix == "больше":
-                        ttk.Label(frame,
-                                  text=f'{prob * 100:.2f}% (x{odds:.2f}) fon {a["tb_55"]} |',
-                                  width=20,
-                                  style="Data.TLabel"
-                                  ).pack(side=tk.LEFT)
-                    elif tol == 5.5 and suffix == "меньше":
-                        ttk.Label(frame,
-                                  text=f'{prob * 100:.2f}% (x{odds:.2f}) fon {a["tm_55"]} |',
-                                  width=20,
-                                  style="Data.TLabel"
-                                  ).pack(side=tk.LEFT)
-                    elif tol == 6.5 and suffix == "больше":
-                        ttk.Label(frame,
-                                  text=f'{prob * 100:.2f}% (x{odds:.2f}) fon {a["tb_65"]} |',
-                                  width=20,
-                                  style="Data.TLabel"
-                                  ).pack(side=tk.LEFT)
-                    elif tol == 6.5 and suffix == "меньше":
-                        ttk.Label(frame,
-                                  text=f'{prob * 100:.2f}% (x{odds:.2f}) fon {a["tm_65"]} |',
-                                  width=20,
-                                  style="Data.TLabel"
-                                  ).pack(side=tk.LEFT)
+                                  ).pack(anchor=tk.W, pady=2)
                     else:
-                        ttk.Label(frame,
-                                  text=f"{prob * 100:.2f}% (x{odds:.2f})",
-                                  width=18,
+                        ttk.Label(col2,
+                                  text=f"{outcome}: {prob * 100:.2f}% (x{odds:.2f}) fon {a['x']}",
                                   style="Data.TLabel"
-                                  ).pack(side=tk.LEFT)
-            """Колонка 5 - Индивидуальные тоталы"""
-            col5 = ttk.Frame(columns_frame)
-            col5.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10)
+                                  ).pack(anchor=tk.W, pady=2)
 
-            ttk.Label(col5, text="Индивидуальные тоталы", style="SubHeader.TLabel").pack(anchor=tk.W)
-            for team in ["Хозяева", "Гости"]:
-                team_frame = ttk.Frame(col5)
-                team_frame.pack(fill=tk.X, pady=5)
-    
-                ttk.Label(team_frame,
-                          text=team,
-                          style="SubHeader.TLabel",
-                          width=15
-                          ).pack(side=tk.LEFT)
-    
-                for tol in [1.5, 2.5, 3.5]:
-                    tol_frame = ttk.Frame(team_frame)
-                    tol_frame.pack(side=tk.LEFT, padx=8)
-    
-                    for suffix in ["ИТБ", "ИТМ"]:
-                        key = f"{team} {suffix} {tol}"
+                """Колонка 3 - Форы"""
+                col3 = ttk.Frame(columns_frame)
+                col3.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10)
+
+                ttk.Label(col3, text="Форы", style="SubHeader.TLabel").pack(anchor=tk.W)
+                for team in ["Хозяева", "Гости"]:
+                    frame = ttk.Frame(col3)
+                    frame.pack(fill=tk.X, pady=3)
+
+                    for handicap in ["-1.5", "+1.5"]:
+                        key = f"{team} {handicap}"
                         prob = results.get(key, 0)
                         odds = 1 / prob if prob > 0 else 0
-                        ttk.Label(tol_frame,
-                                  text=f"{suffix}{tol}: {prob * 100:.2f}% (x{odds:.2f})",
-                                  style="Data.TLabel"
-                                  ).pack(anchor=tk.W)
+                        if handicap == "-1.5" and team == "Хозяева":
+                            ttk.Label(frame,
+                                      text=f'{key}: {prob * 100:.2f}% (x{odds:.2f}) fon {a["fminus15k1"]}',
+                                      width=32,
+                                      style="Data.TLabel"
+                                      ).pack(anchor=tk.W, pady=2)
+                        elif handicap == "+1.5" and team == "Хозяева":
+                            ttk.Label(frame,
+                                      text=f'{key}: {prob * 100:.2f}% (x{odds:.2f}) fon {a["fplus15k1"]}',
+                                      width=32,
+                                      style="Data.TLabel"
+                                      ).pack(anchor=tk.W, pady=2)
+                        elif handicap == "-1.5" and team == "Гости":
+                            ttk.Label(frame,
+                                      text=f'{key}: {prob * 100:.2f}% (x{odds:.2f}) fon {a["fminus15k2"]}',
+                                      width=32,
+                                      style="Data.TLabel"
+                                      ).pack(anchor=tk.W, pady=2)
+                        elif handicap == "+1.5" and team == "Гости":
+                            ttk.Label(frame,
+                                      text=f'{key}: {prob * 100:.2f}% (x{odds:.2f}) fon {a["fplus15k2"]}',
+                                      width=32,
+                                      style="Data.TLabel"
+                                      ).pack(anchor=tk.W, pady=2)
 
-        """Обновление прокрутки"""
-        scrollable_frame.update_idletasks()
-        canvas.config(scrollregion=canvas.bbox("all"))
+                """Колонка 4 - Общие тоталы"""
+                col4 = ttk.Frame(columns_frame)
+                col4.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10)
 
-        """Центрирование окна"""
-        result_window.update_idletasks()
-        width = result_window.winfo_width()
-        height = result_window.winfo_height()
-        x = (result_window.winfo_screenwidth() // 2) - (width // 2)
-        y = (result_window.winfo_screenheight() // 2) - (height // 2)
-        result_window.geometry(f'+{x}+{y}')
+                ttk.Label(col4, text="Общие тоталы", style="SubHeader.TLabel").pack(anchor=tk.W)
+                for tol in [4.5, 5.5, 6.5]:
+                    frame = ttk.Frame(col4)
+                    frame.pack(fill=tk.X, pady=3)
+
+                    ttk.Label(frame, text=f"Тотал {tol}", width=12, style="Data.TLabel").pack(side=tk.LEFT)
+                    for suffix in ["больше", "меньше"]:
+                        key = f"Тотал {tol} {suffix}"
+                        prob = results.get(key, 0)
+                        odds = 1 / prob if prob > 0 else 0
+                        if tol == 4.5 and suffix == "больше":
+                            ttk.Label(frame,
+                                      text=f'{prob * 100:.2f}% (x{odds:.2f}) fon {a["tb_45"]} |',
+                                      width=20,
+                                      style="Data.TLabel"
+                                      ).pack(side=tk.LEFT)
+                        elif tol == 4.5 and suffix == "меньше":
+                            ttk.Label(frame,
+                                      text=f'{prob * 100:.2f}% (x{odds:.2f}) fon {a["tm_45"]} |',
+                                      width=20,
+                                      style="Data.TLabel"
+                                      ).pack(side=tk.LEFT)
+                        elif tol == 5.5 and suffix == "больше":
+                            ttk.Label(frame,
+                                      text=f'{prob * 100:.2f}% (x{odds:.2f}) fon {a["tb_55"]} |',
+                                      width=20,
+                                      style="Data.TLabel"
+                                      ).pack(side=tk.LEFT)
+                        elif tol == 5.5 and suffix == "меньше":
+                            ttk.Label(frame,
+                                      text=f'{prob * 100:.2f}% (x{odds:.2f}) fon {a["tm_55"]} |',
+                                      width=20,
+                                      style="Data.TLabel"
+                                      ).pack(side=tk.LEFT)
+                        elif tol == 6.5 and suffix == "больше":
+                            ttk.Label(frame,
+                                      text=f'{prob * 100:.2f}% (x{odds:.2f}) fon {a["tb_65"]} |',
+                                      width=20,
+                                      style="Data.TLabel"
+                                      ).pack(side=tk.LEFT)
+                        elif tol == 6.5 and suffix == "меньше":
+                            ttk.Label(frame,
+                                      text=f'{prob * 100:.2f}% (x{odds:.2f}) fon {a["tm_65"]} |',
+                                      width=20,
+                                      style="Data.TLabel"
+                                      ).pack(side=tk.LEFT)
+                        else:
+                            ttk.Label(frame,
+                                      text=f"{prob * 100:.2f}% (x{odds:.2f})",
+                                      width=18,
+                                      style="Data.TLabel"
+                                      ).pack(side=tk.LEFT)
+                """Колонка 5 - Индивидуальные тоталы"""
+                col5 = ttk.Frame(columns_frame)
+                col5.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10)
+
+                ttk.Label(col5, text="Индивидуальные тоталы", style="SubHeader.TLabel").pack(anchor=tk.W)
+                for team in ["Хозяева", "Гости"]:
+                    team_frame = ttk.Frame(col5)
+                    team_frame.pack(fill=tk.X, pady=5)
+
+                    ttk.Label(team_frame,
+                              text=team,
+                              style="SubHeader.TLabel",
+                              width=15
+                              ).pack(side=tk.LEFT)
+
+                    for tol in [1.5, 2.5, 3.5]:
+                        tol_frame = ttk.Frame(team_frame)
+                        tol_frame.pack(side=tk.LEFT, padx=8)
+
+                        for suffix in ["ИТБ", "ИТМ"]:
+                            key = f"{team} {suffix} {tol}"
+                            prob = results.get(key, 0)
+                            odds = 1 / prob if prob > 0 else 0
+                            ttk.Label(tol_frame,
+                                      text=f"{suffix}{tol}: {prob * 100:.2f}% (x{odds:.2f})",
+                                      style="Data.TLabel"
+                                      ).pack(anchor=tk.W)
+
+            """Обновление прокрутки"""
+            scrollable_frame.update_idletasks()
+            canvas.config(scrollregion=canvas.bbox("all"))
+
+            """Центрирование окна"""
+            result_window.update_idletasks()
+            width = result_window.winfo_width()
+            height = result_window.winfo_height()
+            x = (result_window.winfo_screenwidth() // 2) - (width // 2)
+            y = (result_window.winfo_screenheight() // 2) - (height // 2)
+            result_window.geometry(f'+{x}+{y}')
 
 
 if __name__ == "__main__":
