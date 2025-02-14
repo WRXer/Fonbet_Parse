@@ -280,8 +280,10 @@ class SimulationApp:
         except Exception as e:
             messagebox.showerror("Ошибка", str(e))
         showinfo(title="Внимание!", message="Обновление таблиц выполнено")
-
-
+        root.destroy()    #Закрываем текущее окно
+        new_root = tk.Tk()    #Создаем новое окно
+        app = SimulationApp(new_root)    #Перезапускаем приложение с новым окном
+        new_root.mainloop()
 
 
     def get_fon_team_data(self, team_name):
