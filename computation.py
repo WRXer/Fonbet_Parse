@@ -183,6 +183,7 @@ def merge_excel_files(file_1, file_2, out_file):
     file1 = os.path.join(data_dir, file_1)
     file2 = os.path.join(data_dir, file_2)
     output_file = os.path.join(data_dir, out_file)
+    inl_file = os.path.join(data_dir, "INL.xlsx")
 
     df1 = pd.read_excel(file1, sheet_name=None)    #Все листы из первого файла
     df2 = pd.read_excel(file2, sheet_name=None)    #Все листы из второго файла
@@ -203,6 +204,11 @@ def merge_excel_files(file_1, file_2, out_file):
     with pd.ExcelWriter(output_file) as writer:    #Сохраняем результат в новый файл
         for sheet_name, df in merged_data.items():
             df.to_excel(writer, sheet_name=sheet_name, index=False)
+
+    with pd.ExcelWriter(inl_file) as writer:    #Сохраняем результат в новый файл
+        for sheet_name, df in merged_data.items():
+            df.to_excel(writer, sheet_name=sheet_name, index=False)
+
     if file1 != output_file:
         os.remove(file1)
     os.remove(file2)
