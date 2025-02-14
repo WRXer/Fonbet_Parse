@@ -1,5 +1,6 @@
 import requests
 import json
+import time
 
 
 sent_events = {}    #Словарь для отслеживания отправленных событий
@@ -25,6 +26,7 @@ def fetch_and_display_line_events(file_name):
         f'https://line52w.bk6bba-resources.com/events/list?lang={language}&version=36403772709&scopeMarket=1600'
     )
     data = response.json()
+    print(time.time())
     #with open("dump.json", "w", encoding="utf-8") as f:
     #    json.dump(data, f, ensure_ascii=False, indent=4)    #Сохраняем всю инфо с фонбет
     events = data.get('events', [])    #Список событий
@@ -32,8 +34,10 @@ def fetch_and_display_line_events(file_name):
     filtered_events = [
         event for event in events
         #if event.get('place') == 'line' and
-        if event.get('sportId') == sport_id and
-           event.get('level') == 1
+        if event.get('startTime') <= time.time() + 86400 and
+            event.get('sportId') == sport_id and
+            event.get('level') == 1 and
+            event.get('team1') != "Хозяева"
     ]   #Фильтруем нужные нам события
     new_events = [
         event for event in filtered_events
