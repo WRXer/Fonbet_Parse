@@ -133,7 +133,7 @@ class SimulationApp:
     def show_results(self, results, home_team, away_team):
         result_window = tk.Toplevel(self.root)
         result_window.title("Результаты симуляции")
-        result_window.minsize(1000, 1000)
+        result_window.minsize(1200, 800)
         result_window.geometry("1200x800")
 
         """Контейнер с прокруткой"""
