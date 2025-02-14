@@ -47,7 +47,11 @@ def fetch_and_display_line_events(file_name):
         message_matches = ""
         for event in new_events:
             team_1 = event.get('team1')
+            if team_1 == "ZSC Lions":
+                team_1 = "Zurich Lions"
             team_2 = event.get('team2')
+            if team_2 == "ZSC Lions":
+                team_2 = "Zurich Lions"
 
             event_factors = next((info for info in custom_factors if info.get('e') == event['id']), None)    #Поиск коэффициентов для данного события
             #flashscore_info = fonbet_line(team_1, team_2, file_name)
