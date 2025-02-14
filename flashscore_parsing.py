@@ -198,5 +198,4 @@ def flashscore_parse():
         logging.error(f"Произошла ошибка в основной функции: {e}")
 
 
-#if __name__ == "__main__":    #Заглушка, удалить при соединении с мейн
-#    flashscore_parse()
+

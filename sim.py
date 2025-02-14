@@ -4,7 +4,7 @@ import difflib
 import os
 
 from tkinter.messagebox import showinfo
-from computation import load_excel_file, calculate_averages, simulate_matches
+from computation import load_excel_file, calculate_averages, simulate_matches, merge_excel_files
 from flashscore_parsing import flashscore_parse
 from fonbet_parsing import fetch_and_display_line_events
 
@@ -275,6 +275,8 @@ class SimulationApp:
         """
         try:
             flashscore_parse()
+            merge_excel_files("INL_data.xlsx", "INL_w_data.xlsx", "INL_sum.xlsx")
+            merge_excel_files("INL_sum.xlsx", "INL_l_data.xlsx", "INL_sum.xlsx")
         except Exception as e:
             messagebox.showerror("Ошибка", str(e))
         showinfo(title="Внимание!", message="Обновление таблиц выполнено")

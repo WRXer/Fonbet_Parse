@@ -26,7 +26,6 @@ def fetch_and_display_line_events(file_name):
         f'https://line52w.bk6bba-resources.com/events/list?lang={language}&version=36403772709&scopeMarket=1600'
     )
     data = response.json()
-    print(time.time())
     #with open("dump.json", "w", encoding="utf-8") as f:
     #    json.dump(data, f, ensure_ascii=False, indent=4)    #Сохраняем всю инфо с фонбет
     events = data.get('events', [])    #Список событий
