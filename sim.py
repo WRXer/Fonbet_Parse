@@ -18,7 +18,7 @@ DATA_DIR = os.path.join(FONBET_PARSE_DIR, 'data')    #Папка data
 class SimulationApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Анализатор матчей")
+        self.root.title("Анализатор матчей v1")
         self.league_data = None
         self.create_widgets()
 
@@ -28,19 +28,10 @@ class SimulationApp:
 
         self.file_combobox = ttk.Combobox(self.file_frame, state="readonly")
         self.file_combobox.pack(padx=5, pady=5, fill=tk.X)
-        self.file_combobox.bind("<<ComboboxSelected>>", self.load_teams)
-
-        self.team_frame = ttk.LabelFrame(self.root, text="Выбор команд")
-        self.team_frame.pack(padx=10, pady=5, fill=tk.X)
-
-        self.home_team = ttk.Combobox(self.team_frame, state="readonly")
-        self.away_team = ttk.Combobox(self.team_frame, state="readonly")
-        self.home_team.pack(side=tk.LEFT, padx=5, pady=5)
-        self.away_team.pack(side=tk.RIGHT, padx=5, pady=5)
 
         self.btn_frame = ttk.Frame(self.root)
         self.btn_frame.pack(pady=10)
-        self.simulate_btn = ttk.Button(self.btn_frame, text="Запустить симуляцию", command=self.run_simulation)
+        self.simulate_btn = ttk.Button(self.btn_frame, text="Запустить симуляцию вручную", command=self.manual_simulation)
         self.simulate_btn.pack()
 
         self.btn_frame = ttk.Frame(self.root)
@@ -63,7 +54,7 @@ class SimulationApp:
             files = []
         self.file_combobox["values"] = files
 
-    def load_teams(self, event):
+    def load_teams(self):
         """
         Вывод команд при выборе лиги
         :param event:
@@ -108,6 +99,45 @@ class SimulationApp:
             else:
                 data[key] = None    #Если таблицы нет, ставим None
         return data
+
+    def manual_simulation(self):
+        """
+        Ручная симуляция
+        :return:
+        """
+        if not self.file_combobox.get():
+            messagebox.showwarning("Ошибка", "Выберите лигу(файл данных)!")
+            return
+        result_window = tk.Toplevel(self.root)
+        result_window.title("Ручная симуляция")
+        result_window.minsize(400, 400)
+        result_window.geometry("400x400")
+
+        """Контейнер с прокруткой"""
+        container = ttk.Frame(result_window)
+        container.pack(fill=tk.BOTH, expand=True)
+
+        canvas = tk.Canvas(container)
+        s_frame = ttk.Frame(canvas)
+
+        canvas.create_window((0, 0), window=s_frame, anchor="nw")
+        canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        """Основной контент"""
+        main_frame = ttk.Frame(s_frame)
+        main_frame.pack(padx=20, pady=20, fill=tk.BOTH, expand=True)
+
+        self.team_frame = ttk.LabelFrame(main_frame, text="Выбор команд")
+        self.team_frame.pack(padx=10, pady=5, fill=tk.X)
+        self.home_team = ttk.Combobox(self.team_frame, state="readonly")
+        self.away_team = ttk.Combobox(self.team_frame, state="readonly")
+        self.home_team.pack(side=tk.LEFT, padx=5, pady=5)
+        self.away_team.pack(side=tk.RIGHT, padx=5, pady=5)
+        self.load_teams()    #загрузка команд
+        self.btn_frame = ttk.Frame(main_frame)
+        self.btn_frame.pack(pady=10)
+        self.simulate_btn = ttk.Button(self.btn_frame, text="Запустить симуляцию", command=self.run_simulation)
+        self.simulate_btn.pack()
 
     def run_simulation(self):
         home_team = self.home_team.get()
@@ -314,6 +344,13 @@ class SimulationApp:
 
 
     def fon_comp(self):
+        """
+        Выводит расчёты с подставкой кф с фонбет
+        :return:
+        """
+        if not self.file_combobox.get():
+            messagebox.showwarning("Ошибка", "Выберите лигу(файл данных)!")
+            return
         data_dir = os.path.join(DATA_DIR)
         file_name = self.file_combobox.get()                    #file_name = "KHL_data.xlsx"  # Адрес к лиге
         file_path = os.path.join(data_dir, file_name)
