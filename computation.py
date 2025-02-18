@@ -171,3 +171,45 @@ def fonbet_line(team_1, team_2, file_name):
         logging.error("Ошибка", str(e))
         print("Ошибка", str(e))
 
+
+def merge_excel_files(file_1, file_2, out_file):
+    """
+    Объединяет два Excel-файла, суммируя числовые значения.
+    :param file1: Путь к первому файлу
+    :param file2: Путь ко второму файлу
+    :param output_file: Путь для сохранения объединённого файла
+    """
+    data_dir = os.path.join(DATA_DIR)
+    file1 = os.path.join(data_dir, file_1)
+    file2 = os.path.join(data_dir, file_2)
+    output_file = os.path.join(data_dir, out_file)
+    inl_file = os.path.join(data_dir, "INL.xlsx")
+
+    df1 = pd.read_excel(file1, sheet_name=None)    #Все листы из первого файла
+    df2 = pd.read_excel(file2, sheet_name=None)    #Все листы из второго файла
+
+    merged_data = {}
+
+    """Обрабатываем каждый лист в обоих файлах"""
+    for sheet in df1.keys():
+        if sheet in df2:
+            df1_sheet = df1[sheet]
+            df2_sheet = df2[sheet]
+            df_combined = pd.concat([df1_sheet, df2_sheet])    #Объединяем данные по названию команды и суммируем числовые значения
+            df_sum = df_combined.groupby('Команда', as_index=False).sum(numeric_only=True)    #Группируем по команде и суммируем числовые данные
+            merged_data[sheet] = df_sum
+        else:
+            merged_data[sheet] = df1[sheet]    #Если листа нет во втором файле, добавляем из первого
+
+    with pd.ExcelWriter(output_file) as writer:    #Сохраняем результат в новый файл
+        for sheet_name, df in merged_data.items():
+            df.to_excel(writer, sheet_name=sheet_name, index=False)
+
+    with pd.ExcelWriter(inl_file) as writer:    #Сохраняем результат в новый файл
+        for sheet_name, df in merged_data.items():
+            df.to_excel(writer, sheet_name=sheet_name, index=False)
+
+    if file1 != output_file:
+        os.remove(file1)
+    os.remove(file2)
+
