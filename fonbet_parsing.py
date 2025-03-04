@@ -10,12 +10,14 @@ def fetch_and_display_line_events(file_name):
     Находим и выводим события
     :return:
     """
-    with open('sport_ids.json', 'r') as f:
+    with open('league_data.json', 'r') as f:
         #sport_ids = [int(line.strip()) for line in f if line.strip().isdigit()]
         sport_ids = json.load(f)
-    sport_id = sport_ids.get(file_name)
+    league_name = file_name.replace("_data.xlsx", "")  # Убираем суффикс
+    sport_id = sport_ids.get(league_name)  # Ищем по обработанному имени
+    print(sport_id)
     language = sport_id['language']
-    sport_id = sport_id['sport_id']
+    sport_id = sport_id['fonbet_id']
     s = requests.Session()
     s.headers = {
         'Accept': 'application/json',
@@ -93,12 +95,10 @@ def fetch_and_display_line_events(file_name):
 
                 match = {
                     "team_1": team_1,
-
                     "p1": p1,
                     "fplus15k1": fplus15k1,
                     "fminus15k1": fminus15k1,
                     "team_2": team_2,
-
                     "p2": p2,
                     "fplus15k2": fplus15k2,
                     "fminus15k2": fminus15k2,
@@ -111,7 +111,6 @@ def fetch_and_display_line_events(file_name):
                 "tm_65": tm_65,
                 }
                 matches_info.append(match)
-
         return matches_info
     else:
         return None

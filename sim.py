@@ -365,7 +365,7 @@ class SimulationApp:
                 league_data = {
                     league_name_entry.get().strip().upper(): {
                     "flashscore_link": flashscore_link,
-                    "fonbet_id": league_id,
+                    "fonbet_id": int(league_id),
                     "language": lang_variant.get().strip()    #Добавляем язык
                     }
                 }
