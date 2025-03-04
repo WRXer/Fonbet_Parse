@@ -360,13 +360,13 @@ class SimulationApp:
             fon_link = re.search(r'https://fon\.bet/.*?(\d+)(?:/|$)', link_fonbet.get().strip())
             if not fon_link:
                 showinfo(title="Ошибка", message="Некорректная ссылка на Fonbet!")
-            league_id = fon_link.group(1)  # Возвращаем найденное число
+            league_id = fon_link.group(1)    #Возвращаем найденное число
             if league_name_entry.get().strip() and link_flashscore.get().strip() and league_id:
                 league_data = {
                     league_name_entry.get().strip().upper(): {
                     "flashscore_link": flashscore_link,
                     "fonbet_id": league_id,
-                    "language": lang_variant.get().strip()  # Добавляем язык
+                    "language": lang_variant.get().strip()    #Добавляем язык
                     }
                 }
                 print(league_data)
@@ -387,8 +387,6 @@ class SimulationApp:
 
         save_button = ttk.Button(add_window, text="Сохранить лиги", command=save_league)
         save_button.pack(pady=10)
-
-
 
     def get_fon_team_data(self, team_name):
         """
