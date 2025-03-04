@@ -181,7 +181,7 @@ class ParseUpdater:
 
     def fetch_data_for_leagues(self, json_data):
         with ThreadPoolExecutor(max_workers=self.max_threads) as executor:
-            executor.map(lambda league_base_url: fetch_and_process_data(league_base_url[0], league_base_url[1]),
+            executor.map(lambda league_base_url: fetch_and_process_data(league_base_url[0], league_base_url[1]['flashscore_link']),
                          json_data.items())     #Параллельная обработка каждой лиги
 
 def flashscore_parse():
@@ -190,7 +190,7 @@ def flashscore_parse():
     """
     try:
         logging.info("Начинаю обработку лиг.")
-        with open('flashscore_list.json', 'r') as f:    #Загружаем JSON файл
+        with open('league_data.json', 'r') as f:    #Загружаем JSON файл
             json_data = json.load(f)
         updater = ParseUpdater(max_threads=5)    #Создаем экземпляр ParseUpdater и запускаем обработку
         updater.fetch_data_for_leagues(json_data)

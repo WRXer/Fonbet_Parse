@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import difflib
-import os
+import os, re, json
 
 from tkinter.messagebox import showinfo
 from computation import load_excel_file, calculate_averages, simulate_matches, merge_excel_files
@@ -18,7 +18,7 @@ DATA_DIR = os.path.join(FONBET_PARSE_DIR, 'data')    #Папка data
 class SimulationApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Анализатор матчей v1")
+        self.root.title("Анализатор матчей v1.1")
         self.league_data = None
         self.create_widgets()
 
@@ -42,6 +42,11 @@ class SimulationApp:
         self.btn_frame = ttk.Frame(self.root)
         self.btn_frame.pack(pady=10)
         self.simulate_btn = ttk.Button(self.btn_frame, text="Свести Фонбет", command=self.fon_comp) #!!!!!!!!!!!
+        self.simulate_btn.pack()
+
+        self.btn_frame = ttk.Frame(self.root)
+        self.btn_frame.pack(pady=10)
+        self.simulate_btn = ttk.Button(self.btn_frame, text="Добавить лигу", command=self.add_league)  # !!!!!!!!!!!
         self.simulate_btn.pack()
 
         self.update_file_list()
@@ -315,6 +320,73 @@ class SimulationApp:
         app = SimulationApp(new_root)    #Перезапускаем приложение с новым окном
         new_root.mainloop()
 
+    def add_league(self):
+        """
+        Добавление лиги
+        :return:
+        """
+        add_window = tk.Toplevel(self.root)
+        add_window.title("Добавление лиги")
+        add_window.minsize(400, 400)
+        add_window.geometry("400x400")
+
+        ttk.Label(add_window, text="Название лиги:").pack(pady=5)
+        league_name_entry = ttk.Entry(add_window, width=50)
+        league_name_entry.pack(pady=5)
+
+        ttk.Label(add_window, text="Отношение лиги:").pack(pady=5)    #Выбор языка
+        lang_variant = tk.StringVar(value="en")  #По умолчанию en
+        lang_combobox = ttk.Combobox(add_window, values=["ru", "en"], state="readonly", textvariable=lang_variant)
+        lang_combobox.pack(pady=5)
+
+        ttk.Label(add_window, text="Ссылка таблицы с flashscore:").pack(pady=5)
+        link_flashscore = ttk.Entry(add_window, width=50)
+        link_flashscore.pack(pady=5)
+
+        ttk.Label(add_window, text="Ссылка лиги с fonbet:").pack(pady=5)
+        link_fonbet = ttk.Entry(add_window, width=50)
+        link_fonbet.pack(pady=5)
+
+        def save_league():
+            """
+            Сохранение данных лиг
+            :return:
+            """
+            flashscore_url = re.findall(r'/standings/([^/]+)/([^/]+)/', link_flashscore.get().strip())
+            if lang_variant.get().strip() == 'ru':
+                flashscore_link = f"https://46.flashscore.ninja/46/x/feed/to_{flashscore_url[0][0]}_{flashscore_url[0][1]}"
+            else:
+                flashscore_link = f"https://5.flashscore.ninja/5/x/feed/to_{flashscore_url[0][0]}_{flashscore_url[0][1]}"
+            fon_link = re.search(r'https://fon\.bet/.*?(\d+)(?:/|$)', link_fonbet.get().strip())
+            if not fon_link:
+                showinfo(title="Ошибка", message="Некорректная ссылка на Fonbet!")
+            league_id = fon_link.group(1)    #Возвращаем найденное число
+            if league_name_entry.get().strip() and link_flashscore.get().strip() and league_id:
+                league_data = {
+                    league_name_entry.get().strip().upper(): {
+                    "flashscore_link": flashscore_link,
+                    "fonbet_id": int(league_id),
+                    "language": lang_variant.get().strip()    #Добавляем язык
+                    }
+                }
+                print(league_data)
+            else:
+                ttk.Label(add_window, text="Заполните все поля!", foreground="red").pack()
+
+            try:
+                with open("league_data.json", 'r', encoding='utf-8') as f:
+                    old_data = json.load(f)    #Загружаем старые данные
+                    if not isinstance(old_data, dict):
+                        old_data = {}    #Если старые данные не в виде словаря, приводим их к пустому словарю
+            except (FileNotFoundError, json.JSONDecodeError):
+                old_data = {}    #Если файл не существует или пуст, начинаем с пустого словаря
+            old_data.update(league_data)    #Объединяем старые данные с новыми
+            with open("league_data.json", 'w', encoding='utf-8') as f:    #Сохраняем обновленные данные в файл
+                json.dump(old_data, f, ensure_ascii=False, indent=4)
+            showinfo(title="Внимание!", message="Лига сохранена")
+
+        save_button = ttk.Button(add_window, text="Сохранить лиги", command=save_league)
+        save_button.pack(pady=10)
 
     def get_fon_team_data(self, team_name):
         """
